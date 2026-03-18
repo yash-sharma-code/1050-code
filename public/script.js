@@ -1,29 +1,31 @@
-// 🚫 REMOVE AUTO REDIRECT LOOP — only check after page loads
+// ✅ CHECK LOGIN FROM SERVER (NO localStorage)
+fetch('/check-auth')
+  .then(res => res.json())
+  .then(data => {
+    if (!data.loggedIn) {
+      window.location.href = "/login.html";
+    } else {
+      startApp();
+    }
+  });
 
-window.onload = () => {
-  const loggedIn = localStorage.getItem("loggedIn");
-
-  console.log("Login status:", loggedIn);
-
-  if (loggedIn !== "true") {
-    alert("Not logged in");
-    window.location.href = "/login.html";
-    return;
-  }
-
-  // Only load data AFTER login confirmed
+function startApp() {
   loadData();
   loadHistory();
-};
 
-/* ---------------- ZONE POSITIONS ---------------- */
+  setInterval(() => {
+    loadData();
+    loadHistory();
+  }, 2000);
+}
+
+/* ---------------- ZONES ---------------- */
 const zonePositions = {
   ICU: { x: 75, y: 25 },
   ER: { x: 30, y: 30 },
   Storage: { x: 65, y: 70 }
 };
 
-/* ---------------- LOAD DATA ---------------- */
 function loadData() {
   fetch('/data')
     .then(res => res.json())
@@ -35,7 +37,6 @@ function loadData() {
     });
 }
 
-/* ---------------- LOAD HISTORY ---------------- */
 function loadHistory() {
   fetch('/history')
     .then(res => res.json())
@@ -44,12 +45,11 @@ function loadHistory() {
       div.innerHTML = "";
 
       data.forEach(item => {
-        div.innerHTML += `<p>${item.name} → ${item.zone} (${item.time})</p>`;
+        div.innerHTML += `<p>${item.name} → ${item.zone}</p>`;
       });
     });
 }
 
-/* ---------------- MOVE DOT ---------------- */
 function moveDot(zone) {
   const dot = document.getElementById("dot");
 
@@ -59,31 +59,9 @@ function moveDot(zone) {
   }
 }
 
-/* ---------------- AI ---------------- */
-function askAI() {
-  const question = document.getElementById("question").value;
-
-  fetch('/ask-ai', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ question })
-  })
-  .then(res => res.json())
-  .then(data => {
-    document.getElementById("answer").innerText = data.answer;
-  });
-}
-
 /* ---------------- LOGOUT ---------------- */
 function logout() {
-  localStorage.removeItem("loggedIn");
-  window.location.href = "/login.html";
+  fetch('/logout').then(() => {
+    window.location.href = "/login.html";
+  });
 }
-
-/* ---------------- AUTO UPDATE ---------------- */
-setInterval(() => {
-  loadData();
-  loadHistory();
-}, 2000);
