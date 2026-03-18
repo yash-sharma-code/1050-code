@@ -1,16 +1,21 @@
-// 🔒 LOGIN CHECK
-if (!localStorage.getItem("loggedIn")) {
+// 🔒 LOGIN CHECK (STRICT FIX)
+const loggedIn = localStorage.getItem("loggedIn");
+
+console.log("Login status:", loggedIn);
+
+if (loggedIn !== "true") {
+  console.log("Not logged in → redirecting");
   window.location.href = "/login.html";
 }
 
-// 📍 ZONE POSITIONS (FIXED TO YOUR MAP)
+/* ---------------- ZONE POSITIONS ---------------- */
 const zonePositions = {
   ICU: { x: 75, y: 25 },
   ER: { x: 30, y: 30 },
   Storage: { x: 65, y: 70 }
 };
 
-// 🔄 LOAD DATA
+/* ---------------- LOAD DATA ---------------- */
 function loadData() {
   fetch('/data')
     .then(res => res.json())
@@ -22,7 +27,7 @@ function loadData() {
     });
 }
 
-// 📜 HISTORY
+/* ---------------- LOAD HISTORY ---------------- */
 function loadHistory() {
   fetch('/history')
     .then(res => res.json())
@@ -36,7 +41,7 @@ function loadHistory() {
     });
 }
 
-// 🔴 MOVE DOT ON MAP
+/* ---------------- MOVE DOT ---------------- */
 function moveDot(zone) {
   const dot = document.getElementById("dot");
 
@@ -46,7 +51,7 @@ function moveDot(zone) {
   }
 }
 
-// 🤖 AI
+/* ---------------- AI ---------------- */
 function askAI() {
   const question = document.getElementById("question").value;
 
@@ -63,17 +68,18 @@ function askAI() {
   });
 }
 
-// 🚪 LOGOUT
+/* ---------------- LOGOUT ---------------- */
 function logout() {
   localStorage.removeItem("loggedIn");
   window.location.href = "/login.html";
 }
 
-// 🔁 AUTO UPDATE
+/* ---------------- AUTO UPDATE ---------------- */
 setInterval(() => {
   loadData();
   loadHistory();
 }, 2000);
 
+// initial load
 loadData();
 loadHistory();
