@@ -1,39 +1,79 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Hospital Asset Tracking</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+// 🔒 LOGIN CHECK
+if (!localStorage.getItem("loggedIn")) {
+  window.location.href = "/login.html";
+}
 
-<h1>Hospital Asset Tracking</h1>
+// 📍 ZONE POSITIONS (FIXED TO YOUR MAP)
+const zonePositions = {
+  ICU: { x: 75, y: 25 },
+  ER: { x: 30, y: 30 },
+  Storage: { x: 65, y: 70 }
+};
 
-<button onclick="logout()">Logout</button>
+// 🔄 LOAD DATA
+function loadData() {
+  fetch('/data')
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("data").innerText =
+        `${data.name} in ${data.zone} (${data.time})`;
 
-<h2>Search</h2>
-<input id="search" placeholder="Search asset">
+      moveDot(data.zone);
+    });
+}
 
-<h2>Floor Map</h2>
+// 📜 HISTORY
+function loadHistory() {
+  fetch('/history')
+    .then(res => res.json())
+    .then(data => {
+      const div = document.getElementById("history");
+      div.innerHTML = "";
 
-<div class="map-container">
-  <img src="floor.png" class="map">
+      data.forEach(item => {
+        div.innerHTML += `<p>${item.name} → ${item.zone} (${item.time})</p>`;
+      });
+    });
+}
 
-  <!-- 🔴 MOVING DOT -->
-  <div id="dot" class="dot"></div>
-</div>
+// 🔴 MOVE DOT ON MAP
+function moveDot(zone) {
+  const dot = document.getElementById("dot");
 
-<h2>Current</h2>
-<p id="data">Loading...</p>
+  if (zonePositions[zone]) {
+    dot.style.left = zonePositions[zone].x + "%";
+    dot.style.top = zonePositions[zone].y + "%";
+  }
+}
 
-<h2>History</h2>
-<div id="history"></div>
+// 🤖 AI
+function askAI() {
+  const question = document.getElementById("question").value;
 
-<h2>Ask AI</h2>
-<input id="question">
-<button onclick="askAI()">Ask</button>
-<p id="answer"></p>
+  fetch('/ask-ai', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ question })
+  })
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById("answer").innerText = data.answer;
+  });
+}
 
-<script src="script.js"></script>
+// 🚪 LOGOUT
+function logout() {
+  localStorage.removeItem("loggedIn");
+  window.location.href = "/login.html";
+}
 
-</body>
-</html>
+// 🔁 AUTO UPDATE
+setInterval(() => {
+  loadData();
+  loadHistory();
+}, 2000);
+
+loadData();
+loadHistory();
