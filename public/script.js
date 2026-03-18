@@ -1,97 +1,39 @@
-let assets={}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Hospital Asset Tracking</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
 
-async function updateAssets(){
+<h1>Hospital Asset Tracking</h1>
 
-const role=localStorage.getItem("role") || "nurse"
+<button onclick="logout()">Logout</button>
 
-const response=await fetch(`/assets?role=${role}`)
+<h2>Search</h2>
+<input id="search" placeholder="Search asset">
 
-assets=await response.json()
+<h2>Floor Map</h2>
 
-drawAssets()
+<div class="map-container">
+  <img src="floor.png" class="map">
 
-}
+  <!-- 🔴 MOVING DOT -->
+  <div id="dot" class="dot"></div>
+</div>
 
-function drawAssets(){
+<h2>Current</h2>
+<p id="data">Loading...</p>
 
-document.querySelectorAll(".asset").forEach(a=>a.remove())
+<h2>History</h2>
+<div id="history"></div>
 
-const search=document.getElementById("search").value.toLowerCase()
+<h2>Ask AI</h2>
+<input id="question">
+<button onclick="askAI()">Ask</button>
+<p id="answer"></p>
 
-Object.keys(assets).forEach(tag=>{
+<script src="script.js"></script>
 
-const asset=assets[tag]
-
-if(search && !asset.name.toLowerCase().includes(search)) return
-
-const zone=document.getElementById(asset.zone)
-
-if(zone){
-
-const div=document.createElement("div")
-
-div.className="asset"
-
-div.innerText=asset.name
-
-zone.appendChild(div)
-
-}
-
-})
-
-}
-
-document.getElementById("search").addEventListener("input",drawAssets)
-
-async function loadHistory(){
-
-const response=await fetch("/history")
-
-const data=await response.json()
-
-const list=document.getElementById("history")
-
-list.innerHTML=""
-
-data.forEach(item=>{
-
-const li=document.createElement("li")
-
-li.innerText=item.name+" → "+item.zone+" ("+item.time+")"
-
-list.appendChild(li)
-
-})
-
-}
-
-async function askAI(){
-
-const question=document.getElementById("question").value
-
-const response=await fetch("/ask",{
-
-method:"POST",
-
-headers:{"Content-Type":"application/json"},
-
-body:JSON.stringify({question})
-
-})
-
-const data=await response.json()
-
-document.getElementById("answer").innerText=data.answer
-
-}
-
-setInterval(()=>{
-
-updateAssets()
-loadHistory()
-
-},2000)
-
-updateAssets()
-loadHistory()
+</body>
+</html>
