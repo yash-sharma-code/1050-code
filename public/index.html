@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Hospital Asset Tracking</title>
+  <title>Hospital Dashboard</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -10,12 +10,19 @@
 
 <button onclick="logout()">Logout</button>
 
+<input id="search" placeholder="Search asset..." oninput="searchAsset()">
+
 <div class="map-container">
   <img src="floor.png" class="map">
-  <div id="dot" class="dot"></div>
+  <div id="map-assets"></div>
 </div>
 
-<h2 id="data">Loading...</h2>
+<h3>Legend</h3>
+<div class="legend">
+  <div><span class="box pump"></span> IV Pump</div>
+  <div><span class="box wheelchair"></span> Wheelchair</div>
+  <div><span class="box ultrasound"></span> Ultrasound</div>
+</div>
 
 <h3>History</h3>
 <div id="history"></div>
