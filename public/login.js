@@ -12,7 +12,7 @@ function login() {
     if (data.success) {
       window.location.href = "/index.html";
     } else {
-      alert("Wrong login");
+      alert("Invalid login");
     }
   });
 }
