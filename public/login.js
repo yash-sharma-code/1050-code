@@ -2,7 +2,7 @@ function login() {
   const username = document.getElementById("username").value;
   const password = document.getElementById("password").value;
 
-  console.log("LOGIN CLICKED"); // 👈 IMPORTANT
+  console.log("LOGIN CLICKED");
 
   fetch('/login', {
     method: 'POST',
@@ -16,13 +16,22 @@ function login() {
     console.log("RESPONSE:", data);
 
     if (data.success === true) {
+      // ✅ store login state
       localStorage.setItem("loggedIn", "true");
-      window.location.href = "/index.html";
+
+      console.log("Saved login:", localStorage.getItem("loggedIn"));
+
+      // ✅ small delay to ensure storage is saved
+      setTimeout(() => {
+        window.location.href = "/index.html";
+      }, 100);
+
     } else {
-      alert("Wrong login");
+      alert("Wrong username or password");
     }
   })
   .catch(err => {
-    console.error("ERROR:", err);
+    console.error("LOGIN ERROR:", err);
+    alert("Login failed");
   });
 }
