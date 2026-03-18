@@ -1,12 +1,20 @@
-// 🔒 LOGIN CHECK (STRICT FIX)
-const loggedIn = localStorage.getItem("loggedIn");
+// 🚫 REMOVE AUTO REDIRECT LOOP — only check after page loads
 
-console.log("Login status:", loggedIn);
+window.onload = () => {
+  const loggedIn = localStorage.getItem("loggedIn");
 
-if (loggedIn !== "true") {
-  console.log("Not logged in → redirecting");
-  window.location.href = "/login.html";
-}
+  console.log("Login status:", loggedIn);
+
+  if (loggedIn !== "true") {
+    alert("Not logged in");
+    window.location.href = "/login.html";
+    return;
+  }
+
+  // Only load data AFTER login confirmed
+  loadData();
+  loadHistory();
+};
 
 /* ---------------- ZONE POSITIONS ---------------- */
 const zonePositions = {
@@ -79,7 +87,3 @@ setInterval(() => {
   loadData();
   loadHistory();
 }, 2000);
-
-// initial load
-loadData();
-loadHistory();
