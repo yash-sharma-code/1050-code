@@ -2,7 +2,9 @@ function login() {
   const username = document.getElementById("username").value;
   const password = document.getElementById("password").value;
 
-  fetch('/login', {   // ✅ IMPORTANT (NO localhost)
+  console.log("Trying login...");
+
+  fetch('/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -11,11 +13,20 @@ function login() {
   })
   .then(res => res.json())
   .then(data => {
-    if (data.success) {
+    console.log("Server response:", data);
+
+    if (data.success === true) {
       localStorage.setItem("loggedIn", "true");
-      window.location.href = "/index.html"; // ✅ redirect works on Render
+
+      console.log("Login success → redirecting");
+
+      window.location.href = "/index.html";
     } else {
-      alert("Invalid login");
+      alert("Wrong username or password");
     }
+  })
+  .catch(err => {
+    console.error("LOGIN ERROR:", err);
+    alert("Login failed (check console)");
   });
 }
