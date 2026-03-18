@@ -8,30 +8,43 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-/* ---------------- LOGIN SYSTEM ---------------- */
-let isLoggedIn = false;
+/* ---------------- USERS ---------------- */
+const users = {
+  nurse: { password: "1234", role: "nurse" },
+  engineer: { password: "1234", role: "engineer" }
+};
 
+let currentRole = null;
+
+/* ---------------- LOGIN ---------------- */
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
 
-  if (username === "admin" && password === "1234") {
-    isLoggedIn = true;
-    res.json({ success: true });
+  if (users[username] && users[username].password === password) {
+    currentRole = users[username].role;
+
+    res.json({
+      success: true,
+      role: currentRole
+    });
   } else {
     res.json({ success: false });
   }
 });
 
 app.get('/check-auth', (req, res) => {
-  res.json({ loggedIn: isLoggedIn });
+  res.json({
+    loggedIn: currentRole !== null,
+    role: currentRole
+  });
 });
 
 app.get('/logout', (req, res) => {
-  isLoggedIn = false;
+  currentRole = null;
   res.json({ success: true });
 });
 
-/* ---------------- ASSET STORAGE ---------------- */
+/* ---------------- DATA ---------------- */
 let assets = {};
 let history = [];
 
