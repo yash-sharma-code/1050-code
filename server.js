@@ -8,10 +8,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-/* ---------------- SIMPLE SESSION ---------------- */
+/* ---------------- LOGIN SYSTEM ---------------- */
 let isLoggedIn = false;
 
-/* ---------------- LOGIN ---------------- */
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
 
@@ -23,25 +22,17 @@ app.post('/login', (req, res) => {
   }
 });
 
-/* ---------------- CHECK LOGIN ---------------- */
 app.get('/check-auth', (req, res) => {
   res.json({ loggedIn: isLoggedIn });
 });
 
-/* ---------------- LOGOUT ---------------- */
 app.get('/logout', (req, res) => {
   isLoggedIn = false;
   res.json({ success: true });
 });
 
-/* ---------------- DATA ---------------- */
-let latestScan = {
-  name: "No asset",
-  zone: "None",
-  reader: "None",
-  time: "-"
-};
-
+/* ---------------- ASSET STORAGE ---------------- */
+let assets = {};
 let history = [];
 
 app.post('/scan', (req, res) => {
@@ -49,15 +40,13 @@ app.post('/scan', (req, res) => {
 
   const time = new Date().toLocaleTimeString();
 
-  latestScan = { name, zone, reader, time };
-  history.unshift(latestScan);
-
-  console.log("SCAN:", latestScan);
+  assets[name] = { name, zone, reader, time };
+  history.unshift({ name, zone, time });
 
   res.json({ success: true });
 });
 
-app.get('/data', (req, res) => res.json(latestScan));
+app.get('/data', (req, res) => res.json(assets));
 app.get('/history', (req, res) => res.json(history));
 
 /* ---------------- START ---------------- */
