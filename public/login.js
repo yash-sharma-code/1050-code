@@ -16,15 +16,13 @@ function login() {
     console.log("RESPONSE:", data);
 
     if (data.success === true) {
-      // ✅ store login state
+      // 🔥 FORCE SAVE + VERIFY
       localStorage.setItem("loggedIn", "true");
 
-      console.log("Saved login:", localStorage.getItem("loggedIn"));
+      console.log("Stored value:", localStorage.getItem("loggedIn"));
 
-      // ✅ small delay to ensure storage is saved
-      setTimeout(() => {
-        window.location.href = "/index.html";
-      }, 100);
+      // 🔥 HARD REDIRECT (important)
+      window.location.replace("/index.html");
 
     } else {
       alert("Wrong username or password");
@@ -32,6 +30,5 @@ function login() {
   })
   .catch(err => {
     console.error("LOGIN ERROR:", err);
-    alert("Login failed");
   });
 }
