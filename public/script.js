@@ -1,4 +1,3 @@
-// ✅ CHECK LOGIN FROM SERVER (NO localStorage)
 fetch('/check-auth')
   .then(res => res.json())
   .then(data => {
@@ -8,6 +7,8 @@ fetch('/check-auth')
       startApp();
     }
   });
+
+let currentAssets = {};
 
 function startApp() {
   loadData();
@@ -26,17 +27,64 @@ const zonePositions = {
   Storage: { x: 65, y: 70 }
 };
 
+/* ---------------- COLORS ---------------- */
+function getColor(name) {
+  name = name.toLowerCase();
+
+  if (name.includes("pump")) return "#007bff";
+  if (name.includes("wheelchair")) return "#28a745";
+  if (name.includes("ultrasound")) return "#ffc107";
+
+  return "#6c757d";
+}
+
+/* ---------------- LOAD DATA ---------------- */
 function loadData() {
   fetch('/data')
     .then(res => res.json())
     .then(data => {
-      document.getElementById("data").innerText =
-        `${data.name} in ${data.zone} (${data.time})`;
-
-      moveDot(data.zone);
+      currentAssets = data;
+      renderAssets(data);
     });
 }
 
+/* ---------------- RENDER ---------------- */
+function renderAssets(assets) {
+  const container = document.getElementById("map-assets");
+  container.innerHTML = "";
+
+  Object.values(assets).forEach(asset => {
+
+    if (!zonePositions[asset.zone]) return;
+
+    const div = document.createElement("div");
+    div.className = "asset";
+
+    div.innerText = asset.name;
+    div.title = `Last seen: ${asset.time}`; // 🔥 hover info
+
+    div.style.left = zonePositions[asset.zone].x + "%";
+    div.style.top = zonePositions[asset.zone].y + "%";
+    div.style.background = getColor(asset.name);
+
+    container.appendChild(div);
+  });
+}
+
+/* ---------------- SEARCH ---------------- */
+function searchAsset() {
+  const query = document.getElementById("search").value.toLowerCase();
+
+  document.querySelectorAll(".asset").forEach(el => {
+    if (el.innerText.toLowerCase().includes(query)) {
+      el.style.border = "3px solid red";
+    } else {
+      el.style.border = "none";
+    }
+  });
+}
+
+/* ---------------- HISTORY ---------------- */
 function loadHistory() {
   fetch('/history')
     .then(res => res.json())
@@ -44,19 +92,10 @@ function loadHistory() {
       const div = document.getElementById("history");
       div.innerHTML = "";
 
-      data.forEach(item => {
+      data.slice(0, 10).forEach(item => {
         div.innerHTML += `<p>${item.name} → ${item.zone}</p>`;
       });
     });
-}
-
-function moveDot(zone) {
-  const dot = document.getElementById("dot");
-
-  if (zonePositions[zone]) {
-    dot.style.left = zonePositions[zone].x + "%";
-    dot.style.top = zonePositions[zone].y + "%";
-  }
 }
 
 /* ---------------- LOGOUT ---------------- */
