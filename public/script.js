@@ -1,14 +1,17 @@
+let userRole = null;
+let currentAssets = {};
+
 fetch('/check-auth')
   .then(res => res.json())
   .then(data => {
     if (!data.loggedIn) {
       window.location.href = "/login.html";
     } else {
+      userRole = data.role;
+      document.getElementById("roleDisplay").innerText = "Role: " + userRole;
       startApp();
     }
   });
-
-let currentAssets = {};
 
 function startApp() {
   loadData();
@@ -45,6 +48,7 @@ function loadData() {
     .then(data => {
       currentAssets = data;
       renderAssets(data);
+      showAnalytics(data);
     });
 }
 
@@ -54,14 +58,13 @@ function renderAssets(assets) {
   container.innerHTML = "";
 
   Object.values(assets).forEach(asset => {
-
     if (!zonePositions[asset.zone]) return;
 
     const div = document.createElement("div");
     div.className = "asset";
 
     div.innerText = asset.name;
-    div.title = `Last seen: ${asset.time}`; // 🔥 hover info
+    div.title = "Last seen: " + asset.time;
 
     div.style.left = zonePositions[asset.zone].x + "%";
     div.style.top = zonePositions[asset.zone].y + "%";
@@ -82,6 +85,31 @@ function searchAsset() {
       el.style.border = "none";
     }
   });
+}
+
+/* ---------------- ANALYTICS ---------------- */
+function showAnalytics(assets) {
+  const analyticsDiv = document.getElementById("analytics");
+
+  if (userRole !== "engineer") {
+    analyticsDiv.innerHTML = "";
+    return;
+  }
+
+  let total = Object.keys(assets).length;
+
+  let zones = {};
+  Object.values(assets).forEach(a => {
+    zones[a.zone] = (zones[a.zone] || 0) + 1;
+  });
+
+  analyticsDiv.innerHTML = `
+    <h3>Analytics</h3>
+    <p>Total Assets: ${total}</p>
+    <p>ICU: ${zones.ICU || 0}</p>
+    <p>ER: ${zones.ER || 0}</p>
+    <p>Storage: ${zones.Storage || 0}</p>
+  `;
 }
 
 /* ---------------- HISTORY ---------------- */
