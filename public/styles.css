@@ -1,0 +1,52 @@
+.map{
+position:relative;
+width:900px;
+margin:auto;
+}
+
+.floor{
+width:100%;
+}
+
+/* ICU ZONE (top right blue area) */
+
+#ICU{
+
+position:absolute;
+top:90px;
+left:640px;
+
+}
+
+/* ER ZONE (large red area left) */
+
+#ER{
+
+position:absolute;
+top:160px;
+left:180px;
+
+}
+
+/* STORAGE ZONE (bottom right yellow area) */
+
+#Storage{
+
+position:absolute;
+top:420px;
+left:650px;
+
+}
+
+/* asset icon */
+
+.asset{
+
+background:#2196F3;
+color:white;
+padding:6px 10px;
+border-radius:20px;
+font-size:12px;
+display:inline-block;
+
+}

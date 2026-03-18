@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Hospital Login</title>
+<link rel="stylesheet" href="styles.css">
+
+</head>
+
+<body>
+
+<h1>Hospital Asset System</h1>
+
+<input id="username" placeholder="Username">
+
+<input id="password" type="password" placeholder="Password">
+
+<button onclick="login()">Login</button>
+
+<script>
+
+async function login(){
+
+const username=document.getElementById("username").value
+const password=document.getElementById("password").value
+
+const response=await fetch("/login",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({username,password})
+
+})
+
+const data=await response.json()
+
+if(data.success){
+
+localStorage.setItem("role",data.role)
+
+window.location="index.html"
+
+}
+
+else{
+
+alert("Login Failed")
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
