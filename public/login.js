@@ -10,6 +10,7 @@ function login() {
   .then(res => res.json())
   .then(data => {
     if (data.success) {
+      localStorage.setItem("role", data.role);
       window.location.href = "/index.html";
     } else {
       alert("Invalid login");
