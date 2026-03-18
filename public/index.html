@@ -1,65 +1,24 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-
-<title>Hospital Asset Tracking</title>
-<link rel="stylesheet" href="styles.css">
-
+  <title>Hospital Asset Tracking</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
 
-<script>
-
-/* LOGIN CHECK */
-
-if(!localStorage.getItem("role")){
-window.location.href="login.html"
-}
-
-function logout(){
-
-localStorage.removeItem("role")
-window.location.href="login.html"
-
-}
-
-</script>
-
-<h1>Hospital Asset Tracking Dashboard</h1>
+<h1>Hospital Asset Tracking</h1>
 
 <button onclick="logout()">Logout</button>
 
-<br><br>
-
-<input id="search" placeholder="Search asset">
-
-<br><br>
-
-<!-- FLOOR MAP -->
-
-<div class="map">
-
-<img src="floor.png" class="floor">
-
-<div id="ICU" class="zone"></div>
-<div id="ER" class="zone"></div>
-<div id="Storage" class="zone"></div>
-
+<div class="map-container">
+  <img src="floor.png" class="map">
+  <div id="dot" class="dot"></div>
 </div>
 
-<h2>Scan History</h2>
+<h2 id="data">Loading...</h2>
 
-<ul id="history"></ul>
-
-<h2>Ask Asset AI</h2>
-
-<input id="question" placeholder="Where is the IV pump?">
-
-<button onclick="askAI()">Ask</button>
-
-<p id="answer"></p>
+<h3>History</h3>
+<div id="history"></div>
 
 <script src="script.js"></script>
 
