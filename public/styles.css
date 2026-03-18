@@ -13,11 +13,27 @@ body {
   width: 100%;
 }
 
-.dot {
+.asset {
   position: absolute;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+}
+
+.legend {
+  margin-top: 20px;
+}
+
+.box {
+  display: inline-block;
   width: 15px;
   height: 15px;
-  background: red;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
+  margin-right: 5px;
 }
+
+.pump { background: #007bff; }
+.wheelchair { background: #28a745; }
+.ultrasound { background: #ffc107; }
