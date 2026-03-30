@@ -11,7 +11,7 @@ const port = new SerialPort({
 });
 
 // 🔥 CHANGE THIS TO YOUR RENDER BACKEND
-const SERVER = "https://your-app.onrender.com/scan";
+const SERVER = "https://rfid-tracker-4rrm.onrender.com";
 
 /* ---------------- SERIAL PARSER ---------------- */
 
