@@ -1,32 +1,40 @@
 async function login() {
-const username = document.getElementById("username").value;
-const password = document.getElementById("password").value;
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
 
-console.log("LOGIN CLICKED");
+  console.log("Login attempt:", username);
 
-try {
-const res = await fetch('/login', {
-method: 'POST',
-headers: {
-'Content-Type': 'application/json'
-},
-body: JSON.stringify({ username, password })
-});
+  if (!username || !password) {
+    alert("Please enter username and password");
+    return;
+  }
 
-const data = await res.json();
+  try {
+    const res = await fetch('/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ username, password })
+    });
 
-if (data.success) {
-// Save role locally (no backend session issues)
-localStorage.setItem("role", data.role);
+    const data = await res.json();
 
-// Redirect to dashboard
-window.location.href = "/index.html";
-} else {
-alert("Invalid username or password");
-}
+    if (data.success) {
+      // Save role locally (RBAC control)
+      localStorage.setItem("role", data.role);
 
-} catch (err) {
-console.error("Login error:", err);
-alert("Server error");
-}
+      console.log("Login success, role:", data.role);
+
+      // Redirect to dashboard
+      window.location.href = "/index.html";
+
+    } else {
+      alert("Invalid username or password");
+    }
+
+  } catch (err) {
+    console.error("Login error:", err);
+    alert("Server error. Try again.");
+  }
 }
