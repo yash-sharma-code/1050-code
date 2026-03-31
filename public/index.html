@@ -2,16 +2,18 @@
 <html>
 <head>
   <title>MediTrack Dashboard</title>
-
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #f4f6f9;
+
+      /* 🔥 NICE BACKGROUND */
+      background: linear-gradient(135deg, #eef2f7, #d9e4f5);
     }
 
+    /* HEADER */
     .header {
       background: white;
       padding: 15px 30px;
@@ -22,7 +24,7 @@
     }
 
     .title {
-      font-size: 20px;
+      font-size: 22px;
       font-weight: bold;
     }
 
@@ -56,25 +58,26 @@
       text-align: center;
     }
 
-    /* MAP */
+    /* MAP CARD */
     .map-container {
       position: relative;
-      width: 800px;
+      width: 850px;
       margin: 20px auto;
       background: white;
-      padding: 15px;
-      border-radius: 12px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     }
 
     .map {
       width: 100%;
-      border-radius: 10px;
+      border-radius: 12px;
     }
 
     #map div {
       position: absolute;
       transform: translate(-50%, -50%);
+      font-size: 12px;
     }
 
     /* LEGEND */
@@ -97,15 +100,17 @@
       border-radius: 3px;
     }
 
+    /* PANELS */
     .panel {
       background: white;
       margin: 20px auto;
-      padding: 15px;
+      padding: 20px;
       width: 60%;
-      border-radius: 12px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
       text-align: left;
     }
+
   </style>
 </head>
 
@@ -136,22 +141,19 @@
   <!-- LEGEND -->
   <div class="legend">
     <div class="legend-item">
-      <div class="color-box" style="background:blue;"></div>
-      IV Pump
+      <div class="color-box" style="background:blue;"></div> IV Pump
     </div>
     <div class="legend-item">
-      <div class="color-box" style="background:red;"></div>
-      Ventilator
+      <div class="color-box" style="background:red;"></div> Ventilator
     </div>
     <div class="legend-item">
-      <div class="color-box" style="background:green;"></div>
-      Monitor
+      <div class="color-box" style="background:green;"></div> Monitor
     </div>
   </div>
 
   <!-- ANALYTICS -->
   <div id="analytics" class="panel"></div>
-  <canvas id="chart" width="400" height="200"></canvas>
+  <canvas id="chart"></canvas>
 
   <!-- ADMIN -->
   <div id="adminPanel" class="panel" style="display:none;">
@@ -163,6 +165,5 @@
 </div>
 
 <script src="script.js"></script>
-
 </body>
 </html>
