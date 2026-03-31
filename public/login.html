@@ -1,16 +1,83 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Login</title>
+<title>RFID Tracker Login</title>
+
+<style>
+body {
+margin: 0;
+font-family: Arial, sans-serif;
+background: linear-gradient(to right, #4facfe, #00f2fe);
+height: 100vh;
+display: flex;
+justify-content: center;
+align-items: center;
+}
+
+.login-container {
+background: white;
+padding: 40px;
+border-radius: 12px;
+width: 300px;
+box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+text-align: center;
+}
+
+h1 {
+margin-bottom: 20px;
+color: #333;
+}
+
+input {
+width: 100%;
+padding: 12px;
+margin: 10px 0;
+border-radius: 6px;
+border: 1px solid #ccc;
+font-size: 14px;
+}
+
+input:focus {
+outline: none;
+border-color: #4facfe;
+}
+
+button {
+width: 100%;
+padding: 12px;
+margin-top: 15px;
+border: none;
+border-radius: 6px;
+background: #4facfe;
+color: white;
+font-size: 16px;
+cursor: pointer;
+transition: 0.3s;
+}
+
+button:hover {
+background: #3a8de0;
+}
+
+.subtitle {
+font-size: 13px;
+color: gray;
+margin-bottom: 15px;
+}
+</style>
 </head>
+
 <body>
 
-<h2>Hospital Login</h2>
+<div class="login-container">
+<h1>Hospital Login</h1>
+<div class="subtitle">RFID Asset Tracking System</div>
 
-<input id="username" placeholder="Username"><br><br>
-<input id="password" type="password" placeholder="Password"><br><br>
+<input id="username" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
 
 <button onclick="login()">Login</button>
+</div>
 
 <script src="login.js"></script>
 
