@@ -1,5 +1,3 @@
-/* ---------------- AUTH ---------------- */
-
 const role = localStorage.getItem("role");
 
 if (!role) {
@@ -7,8 +5,6 @@ if (!role) {
 }
 
 document.getElementById("roleDisplay").innerText = "Role: " + role;
-
-/* ---------------- ZONES ---------------- */
 
 const map = document.getElementById("map");
 
@@ -18,8 +14,14 @@ const positions = {
   Storage: { x: 70, y: 70 }
 };
 
-/* ---------------- LOAD ASSETS ---------------- */
+/* 🔥 COLOR SYSTEM */
+function getColor(name) {
+  if (name.toLowerCase().includes("pump")) return "blue";
+  if (name.toLowerCase().includes("vent")) return "red";
+  return "green";
+}
 
+/* LOAD ASSETS */
 async function loadAssets() {
   const res = await fetch('/assets');
   const data = await res.json();
@@ -27,75 +29,56 @@ async function loadAssets() {
   map.innerHTML = "";
 
   data.forEach(asset => {
-
     const div = document.createElement("div");
 
-    div.style.position = "absolute";
     div.style.left = positions[asset.zone].x + "%";
     div.style.top = positions[asset.zone].y + "%";
-    div.style.transform = "translate(-50%, -50%)";
 
-    // 🔥 ROLE DISPLAY
+    const color = getColor(asset.name);
+
     if (role === "nurse") {
-      div.innerHTML = `
-        <div style="background:blue;color:white;padding:5px;border-radius:5px;">
-          ${asset.name}
-        </div>
-      `;
+      div.innerHTML = `<div style="background:${color};color:white;padding:5px;border-radius:5px;">
+        ${asset.name}
+      </div>`;
     }
 
-    if (role === "engineer") {
-      div.innerHTML = `
-        <div style="background:orange;color:white;padding:5px;border-radius:5px;">
-          ${asset.name}<br>
-          ${asset.zone}<br>
-          ${asset.time}
-        </div>
-      `;
-    }
-
-    if (role === "admin") {
-      div.innerHTML = `
-        <div style="background:red;color:white;padding:5px;border-radius:5px;">
-          ${asset.name}<br>
-          ${asset.zone}<br>
-          ${asset.time}
-        </div>
-      `;
+    if (role === "engineer" || role === "admin") {
+      div.innerHTML = `<div style="background:${color};color:white;padding:5px;border-radius:5px;">
+        ${asset.name}<br>${asset.zone}<br>${asset.time}
+      </div>`;
     }
 
     map.appendChild(div);
   });
 
-  showAnalytics(data);
-}
-
-/* ---------------- ANALYTICS ---------------- */
-
-function showAnalytics(data) {
-  const analyticsDiv = document.getElementById("analytics");
-
-  if (role === "engineer" || role === "admin") {
-
-    let total = data.length;
-
-    let zones = {};
-    data.forEach(a => {
-      zones[a.zone] = (zones[a.zone] || 0) + 1;
-    });
-
-    analyticsDiv.innerHTML = `
-      <h3>Analytics</h3>
-      <p>Total Assets: ${total}</p>
-      <p>ICU: ${zones.ICU || 0}</p>
-      <p>ER: ${zones.ER || 0}</p>
-      <p>Storage: ${zones.Storage || 0}</p>
-    `;
+  if (role !== "nurse") {
+    showChart(data);
   }
 }
 
-/* ---------------- HISTORY (ADMIN ONLY) ---------------- */
+/* 🔥 CHART */
+function showChart(data) {
+  const counts = {};
 
+  data.forEach(a => {
+    counts[a.zone] = (counts[a.zone] || 0) + 1;
+  });
+
+  const ctx = document.getElementById("chart");
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: Object.keys(counts),
+      datasets: [{
+        label: 'Assets per Zone',
+        data: Object.values(counts)
+      }]
+    }
+  });
+}
+
+/* ADMIN HISTORY */
 async function loadHistory() {
   if (role !== "admin") return;
 
@@ -105,47 +88,36 @@ async function loadHistory() {
   const data = await res.json();
 
   const div = document.getElementById("history");
-  div.innerHTML = "<h3>History</h3>";
+  div.innerHTML = "";
 
   data.slice(-10).forEach(item => {
-    div.innerHTML += `<p>${item.name} → ${item.zone} (${item.time})</p>`;
+    div.innerHTML += `<p>${item.name} → ${item.zone}</p>`;
   });
 }
 
-/* ---------------- RESET (ADMIN ONLY) ---------------- */
-
+/* RESET */
 function resetSystem() {
-  fetch('/reset')
-    .then(() => {
-      alert("System reset");
-      loadAssets();
-      loadHistory();
-    });
+  fetch('/reset').then(() => location.reload());
 }
 
-/* ---------------- SEARCH ---------------- */
-
+/* SEARCH */
 function searchAsset() {
   const query = document.getElementById("search").value.toLowerCase();
 
   document.querySelectorAll("#map div").forEach(el => {
-    if (el.innerText.toLowerCase().includes(query)) {
-      el.style.border = "3px solid yellow";
-    } else {
-      el.style.border = "none";
-    }
+    el.style.border = el.innerText.toLowerCase().includes(query)
+      ? "3px solid yellow"
+      : "none";
   });
 }
 
-/* ---------------- LOGOUT ---------------- */
-
+/* LOGOUT */
 function logout() {
   localStorage.removeItem("role");
   window.location.href = "/login.html";
 }
 
-/* ---------------- AUTO REFRESH ---------------- */
-
+/* REFRESH */
 setInterval(() => {
   loadAssets();
   loadHistory();
