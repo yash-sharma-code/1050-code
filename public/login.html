@@ -1,85 +1,115 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>RFID Tracker Login</title>
+  <title>RFID Tracker Login</title>
 
-<style>
-body {
-margin: 0;
-font-family: Arial, sans-serif;
-background: linear-gradient(to right, #4facfe, #00f2fe);
-height: 100vh;
-display: flex;
-justify-content: center;
-align-items: center;
-}
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
 
-.login-container {
-background: white;
-padding: 40px;
-border-radius: 12px;
-width: 300px;
-box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-text-align: center;
-}
+      /* BACKGROUND IMAGE */
+      background: url('hospital.jpg') no-repeat center center fixed;
+      background-size: cover;
 
-h1 {
-margin-bottom: 20px;
-color: #333;
-}
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-input {
-width: 100%;
-padding: 12px;
-margin: 10px 0;
-border-radius: 6px;
-border: 1px solid #ccc;
-font-size: 14px;
-}
+    /* DARK OVERLAY */
+    body::before {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
 
-input:focus {
-outline: none;
-border-color: #4facfe;
-}
+    .login-container {
+      position: relative;
+      z-index: 1;
 
-button {
-width: 100%;
-padding: 12px;
-margin-top: 15px;
-border: none;
-border-radius: 6px;
-background: #4facfe;
-color: white;
-font-size: 16px;
-cursor: pointer;
-transition: 0.3s;
-}
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      width: 320px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      text-align: center;
+    }
 
-button:hover {
-background: #3a8de0;
-}
+    /* LOGO */
+    .logo {
+      width: 130px;
+      margin-bottom: 15px;
+    }
 
-.subtitle {
-font-size: 13px;
-color: gray;
-margin-bottom: 15px;
-}
-</style>
+    h1 {
+      margin-bottom: 5px;
+      color: #333;
+      font-size: 22px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: gray;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #4facfe;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 6px;
+      background: #4facfe;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #3a8de0;
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="login-container">
-<h1>Hospital Login</h1>
-<div class="subtitle">RFID Asset Tracking System</div>
+  <div class="login-container">
 
-<input id="username" placeholder="Username">
-<input id="password" type="password" placeholder="Password">
+    <!-- ✅ YOUR LOGO -->
+    <img src="hospitallogo.png" class="logo">
 
-<button onclick="login()">Login</button>
-</div>
+    <h1>Hospital Login</h1>
+    <div class="subtitle">RFID Asset Tracking System</div>
 
-<script src="login.js"></script>
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
+
+    <button onclick="login()">Login</button>
+  </div>
+
+  <script src="login.js"></script>
 
 </body>
 </html>
