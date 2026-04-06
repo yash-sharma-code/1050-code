@@ -1,5 +1,3 @@
-/* ---------------- AUTH ---------------- */
-
 const role = localStorage.getItem("role");
 
 if (!role) {
@@ -8,9 +6,9 @@ if (!role) {
 
 document.getElementById("roleDisplay").innerText = "Role: " + role;
 
-/* ---------------- MAP SETUP ---------------- */
-
 const map = document.getElementById("map");
+
+/* ---------------- ZONES ---------------- */
 
 const positions = {
   ICU: { x: 70, y: 20 },
@@ -18,19 +16,22 @@ const positions = {
   Storage: { x: 70, y: 70 }
 };
 
-/* ---------------- COLOR SYSTEM ---------------- */
+/* ---------------- COLORS ---------------- */
 
 function getColor(name) {
-  const lower = name.toLowerCase();
+  const n = name.toLowerCase();
 
-  if (lower.includes("pump")) return "blue";
-  if (lower.includes("vent")) return "red";
-  if (lower.includes("monitor")) return "green";
-
+  if (n.includes("pump")) return "blue";
+  if (n.includes("vent")) return "red";
+  if (n.includes("monitor")) return "green";
   return "gray";
 }
 
-/* ---------------- LOAD ASSETS (NO OVERLAP FIX) ---------------- */
+function getStatusColor(status) {
+  return status === "In Use" ? "orange" : "lime";
+}
+
+/* ---------------- LOAD ASSETS ---------------- */
 
 async function loadAssets() {
   const res = await fetch('/assets');
@@ -38,17 +39,13 @@ async function loadAssets() {
 
   map.innerHTML = "";
 
-  // 🔥 GROUP BY ZONE
   const zoneGroups = {};
 
   data.forEach(asset => {
-    if (!zoneGroups[asset.zone]) {
-      zoneGroups[asset.zone] = [];
-    }
+    if (!zoneGroups[asset.zone]) zoneGroups[asset.zone] = [];
     zoneGroups[asset.zone].push(asset);
   });
 
-  // 🔥 RENDER EACH ZONE
   Object.keys(zoneGroups).forEach(zone => {
     const assets = zoneGroups[zone];
 
@@ -56,7 +53,6 @@ async function loadAssets() {
 
       const base = positions[zone];
 
-      // 🔥 OFFSET GRID (prevents overlap)
       const offsetX = (index % 3) * 5 - 5;
       const offsetY = Math.floor(index / 3) * 5;
 
@@ -66,23 +62,28 @@ async function loadAssets() {
       div.style.top = (base.y + offsetY) + "%";
 
       const color = getColor(asset.name);
-
-      /* ---------------- RBAC DISPLAY ---------------- */
+      const statusColor = getStatusColor(asset.status);
 
       if (role === "nurse") {
         div.innerHTML = `
-          <div style="background:${color};color:white;padding:5px;border-radius:5px;">
-            ${asset.name}
+          <div style="background:${color};color:white;padding:6px;border-radius:6px;">
+            ${asset.name}<br>
+            <span style="color:${statusColor};font-size:11px;">
+              ● ${asset.status}
+            </span>
           </div>
         `;
       }
 
       if (role === "engineer" || role === "admin") {
         div.innerHTML = `
-          <div style="background:${color};color:white;padding:5px;border-radius:5px;">
+          <div style="background:${color};color:white;padding:6px;border-radius:6px;">
             ${asset.name}<br>
             ${asset.zone}<br>
-            ${asset.time}
+            ${asset.time}<br>
+            <span style="color:${statusColor};font-size:11px;">
+              ● ${asset.status}
+            </span>
           </div>
         `;
       }
@@ -91,14 +92,12 @@ async function loadAssets() {
     });
   });
 
-  /* ---------------- ANALYTICS ---------------- */
-
   if (role !== "nurse") {
     showChart(data);
   }
 }
 
-/* ---------------- CHART (ENGINEER + ADMIN) ---------------- */
+/* ---------------- CHART ---------------- */
 
 let chartInstance = null;
 
@@ -106,31 +105,28 @@ function showChart(data) {
   const counts = {};
 
   data.forEach(a => {
-    counts[a.zone] = (counts[a.zone] || 0) + 1;
+    counts[a.name] = (counts[a.name] || 0) + 1;
   });
 
   const ctx = document.getElementById("chart");
 
   if (!ctx) return;
 
-  // 🔥 DESTROY OLD CHART (prevents stacking bug)
-  if (chartInstance) {
-    chartInstance.destroy();
-  }
+  if (chartInstance) chartInstance.destroy();
 
   chartInstance = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: Object.keys(counts),
       datasets: [{
-        label: 'Assets per Zone',
+        label: 'Assets by Type',
         data: Object.values(counts)
       }]
     }
   });
 }
 
-/* ---------------- ADMIN HISTORY ---------------- */
+/* ---------------- HISTORY ---------------- */
 
 async function loadHistory() {
   if (role !== "admin") return;
@@ -145,13 +141,11 @@ async function loadHistory() {
   div.innerHTML = "<h3>Recent Activity</h3>";
 
   data.slice(-10).forEach(item => {
-    div.innerHTML += `
-      <p>${item.name} → ${item.zone} (${item.time})</p>
-    `;
+    div.innerHTML += `<p>${item.name} → ${item.zone} (${item.time})</p>`;
   });
 }
 
-/* ---------------- RESET SYSTEM ---------------- */
+/* ---------------- RESET ---------------- */
 
 function resetSystem() {
   fetch('/reset').then(() => {
@@ -167,11 +161,9 @@ function searchAsset() {
   const query = document.getElementById("search").value.toLowerCase();
 
   document.querySelectorAll("#map div").forEach(el => {
-    if (el.innerText.toLowerCase().includes(query)) {
-      el.style.border = "3px solid yellow";
-    } else {
-      el.style.border = "none";
-    }
+    el.style.border = el.innerText.toLowerCase().includes(query)
+      ? "3px solid yellow"
+      : "none";
   });
 }
 
@@ -182,14 +174,12 @@ function logout() {
   window.location.href = "/login.html";
 }
 
-/* ---------------- AUTO REFRESH ---------------- */
+/* ---------------- REFRESH (1 SECOND) ---------------- */
 
 setInterval(() => {
   loadAssets();
   loadHistory();
-}, 2000);
-
-/* ---------------- INIT ---------------- */
+}, 1000);
 
 loadAssets();
 loadHistory();
