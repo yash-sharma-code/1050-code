@@ -1,4 +1,3 @@
-
 const express = require('express');
 const cors = require('cors');
 
@@ -8,7 +7,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-/* USERS */
+/* ---------------- USERS ---------------- */
 
 const users = {
   nurse: { password: "123", role: "nurse" },
@@ -16,7 +15,7 @@ const users = {
   admin: { password: "123", role: "admin" }
 };
 
-/* LOGIN */
+/* ---------------- LOGIN ---------------- */
 
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
@@ -28,24 +27,27 @@ app.post('/login', (req, res) => {
   }
 });
 
-/* DATA */
+/* ---------------- DATA ---------------- */
 
 let assets = {};
 let history = [];
 
-/* SCAN */
+/* ---------------- SCAN ---------------- */
 
 app.post('/scan', (req, res) => {
   const { name, zone, reader } = req.body;
 
-  const time = new Date().toLocaleTimeString([], {
-    hour: '2-digit',
-    minute: '2-digit'
-  });
+  const time = Date.now(); // ✅ FIXED TIME
 
   const status = Math.random() > 0.5 ? "Available" : "In Use";
 
-  const asset = { name, zone, reader, time, status };
+  const asset = {
+    name,
+    zone,
+    reader,
+    time,
+    status
+  };
 
   assets[name] = asset;
   history.push(asset);
@@ -55,7 +57,7 @@ app.post('/scan', (req, res) => {
   res.sendStatus(200);
 });
 
-/* ROUTES */
+/* ---------------- ROUTES ---------------- */
 
 app.get('/assets', (req, res) => {
   res.json(Object.values(assets));
@@ -71,7 +73,7 @@ app.get('/reset', (req, res) => {
   res.json({ success: true });
 });
 
-/* START */
+/* ---------------- START ---------------- */
 
 const PORT = process.env.PORT || 3000;
 
