@@ -7,7 +7,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-/* ---------------- USERS (RBAC) ---------------- */
+/* ---------------- USERS ---------------- */
 
 const users = {
   nurse: { password: "123", role: "nurse" },
@@ -27,54 +27,56 @@ app.post('/login', (req, res) => {
   }
 });
 
-/* ---------------- DATA STORAGE ---------------- */
+/* ---------------- DATA ---------------- */
 
 let assets = {};
 let history = [];
 
-/* ---------------- RFID SCAN ENDPOINT ---------------- */
+/* ---------------- SCAN ---------------- */
 
 app.post('/scan', (req, res) => {
   const { name, zone, reader } = req.body;
 
   const time = new Date().toLocaleTimeString();
 
-  // Store latest state
-  assets[name] = { name, zone, reader, time };
+  const status = Math.random() > 0.5 ? "Available" : "In Use";
 
-  // Store history
-  history.push({ name, zone, reader, time });
+  const asset = {
+    name,
+    zone,
+    reader,
+    time,
+    status
+  };
+
+  assets[name] = asset;
+  history.push(asset);
 
   console.log("SCAN:", name, "→", zone);
 
   res.sendStatus(200);
 });
 
-/* ---------------- GET CURRENT ASSETS ---------------- */
+/* ---------------- ROUTES ---------------- */
 
 app.get('/assets', (req, res) => {
   res.json(Object.values(assets));
 });
 
-/* ---------------- GET HISTORY ---------------- */
-
 app.get('/history', (req, res) => {
   res.json(history);
 });
 
-/* ---------------- RESET SYSTEM ---------------- */
-
 app.get('/reset', (req, res) => {
   assets = {};
   history = [];
-  console.log("System reset");
   res.json({ success: true });
 });
 
-/* ---------------- START SERVER ---------------- */
+/* ---------------- START ---------------- */
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(PORT, () => {
+  console.log("Server running on port", PORT);
 });
