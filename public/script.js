@@ -8,7 +8,9 @@ document.getElementById("roleDisplay").innerText = "Role: " + role;
 
 const map = document.getElementById("map");
 
-/* ---------------- ZONES ---------------- */
+let currentSearch = "";
+
+/* ZONES */
 
 const positions = {
   ICU: { x: 70, y: 20 },
@@ -16,7 +18,7 @@ const positions = {
   Storage: { x: 70, y: 70 }
 };
 
-/* ---------------- COLORS ---------------- */
+/* COLORS */
 
 function getColor(name) {
   const n = name.toLowerCase();
@@ -31,7 +33,7 @@ function getStatusColor(status) {
   return status === "In Use" ? "orange" : "lime";
 }
 
-/* ---------------- LOAD ASSETS ---------------- */
+/* LOAD ASSETS */
 
 async function loadAssets() {
   const res = await fetch('/assets');
@@ -92,12 +94,31 @@ async function loadAssets() {
     });
   });
 
+  applySearchHighlight();
+
   if (role !== "nurse") {
     showChart(data);
   }
 }
 
-/* ---------------- CHART ---------------- */
+/* SEARCH FIX */
+
+function searchAsset() {
+  currentSearch = document.getElementById("search").value.toLowerCase();
+  applySearchHighlight();
+}
+
+function applySearchHighlight() {
+  document.querySelectorAll("#map div").forEach(el => {
+    if (el.innerText.toLowerCase().includes(currentSearch)) {
+      el.style.border = "3px solid yellow";
+    } else {
+      el.style.border = "none";
+    }
+  });
+}
+
+/* CHART */
 
 let chartInstance = null;
 
@@ -126,7 +147,7 @@ function showChart(data) {
   });
 }
 
-/* ---------------- HISTORY ---------------- */
+/* HISTORY */
 
 async function loadHistory() {
   if (role !== "admin") return;
@@ -145,7 +166,7 @@ async function loadHistory() {
   });
 }
 
-/* ---------------- RESET ---------------- */
+/* RESET */
 
 function resetSystem() {
   fetch('/reset').then(() => {
@@ -155,26 +176,14 @@ function resetSystem() {
   });
 }
 
-/* ---------------- SEARCH ---------------- */
-
-function searchAsset() {
-  const query = document.getElementById("search").value.toLowerCase();
-
-  document.querySelectorAll("#map div").forEach(el => {
-    el.style.border = el.innerText.toLowerCase().includes(query)
-      ? "3px solid yellow"
-      : "none";
-  });
-}
-
-/* ---------------- LOGOUT ---------------- */
+/* LOGOUT */
 
 function logout() {
   localStorage.removeItem("role");
   window.location.href = "/login.html";
 }
 
-/* ---------------- REFRESH (1 SECOND) ---------------- */
+/* REFRESH */
 
 setInterval(() => {
   loadAssets();
