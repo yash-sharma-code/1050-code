@@ -37,7 +37,7 @@ let history = [];
 app.post('/scan', (req, res) => {
   const { name, zone, reader } = req.body;
 
-  const time = Date.now(); // ✅ FIXED TIME
+  const time = Date.now(); // FIXED TIME
 
   const status = Math.random() > 0.5 ? "Available" : "In Use";
 
