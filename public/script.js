@@ -1,4 +1,3 @@
-console.log("VERSION 2 LOADED");
 const role = localStorage.getItem("role");
 
 if (!role) {
