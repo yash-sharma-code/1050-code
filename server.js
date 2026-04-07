@@ -19,6 +19,7 @@ const users = {
 
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
+  console.log("RECEIVED NAME:", name);
 
   if (users[username] && users[username].password === password) {
     res.json({ success: true, role: users[username].role });
