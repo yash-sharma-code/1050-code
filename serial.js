@@ -34,10 +34,14 @@ parser.on('data', async (line) => {
   if (line.startsWith("Asset:")) {
     let raw = line.replace("Asset:", "").trim().toLowerCase();
 
-    if (raw.includes("bed")) currentAsset = "Hospital Bed";
+    // 🔥 KEY FIX: Heart Monitor → Hospital Bed
+    if (raw.includes("heart")) currentAsset = "Hospital Bed";
+
+    else if (raw.includes("bed")) currentAsset = "Hospital Bed";
     else if (raw.includes("pump")) currentAsset = "IV Pump";
     else if (raw.includes("vent")) currentAsset = "Ventilator";
     else if (raw.includes("monitor")) currentAsset = "Monitor";
+
     else currentAsset = raw;
   }
 
@@ -51,9 +55,9 @@ parser.on('data', async (line) => {
         reader: currentZone + "_READER"
       });
 
-      console.log("Sent:", currentAsset, "→", currentZone);
+      console.log("✅ Sent:", currentAsset, "→", currentZone);
     } catch (err) {
-      console.error("Error sending:", err.message);
+      console.error("❌ Error sending:", err.message);
     }
 
     currentZone = "";
@@ -64,9 +68,9 @@ parser.on('data', async (line) => {
 /* ---------------- CONNECTION ---------------- */
 
 port.on('open', () => {
-  console.log("Serial connected on", PORT);
+  console.log("✅ Serial connected on", PORT);
 });
 
 port.on('error', (err) => {
-  console.error("Serial error:", err.message);
+  console.error("❌ Serial error:", err.message);
 });
