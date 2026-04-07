@@ -8,6 +8,25 @@ document.getElementById("roleDisplay").innerText = "Role: " + role;
 
 const map = document.getElementById("map");
 
+let currentSearch = "";
+
+/* ---------------- TIME FIX ---------------- */
+
+function formatTime(timestamp) {
+  return new Date(timestamp).toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+/* ---------------- ZONES ---------------- */
+
+const positions = {
+  ICU: { x: 70, y: 20 },
+  ER: { x: 20, y: 30 },
+  Storage: { x: 70, y: 70 }
+};
+
 /* ---------------- COLORS ---------------- */
 
 function getColor(name) {
@@ -18,16 +37,6 @@ function getColor(name) {
   if (n.includes("monitor")) return "green";
 
   return "gray";
-}
-
-/*  ADD THIS FUNCTION (ONLY NEW ADDITION) */
-
-function formatName(name) {
-  const n = name.toLowerCase();
-
-  if (n.includes("bed")) return "Hospital Bed";
-
-  return name;
 }
 
 function getStatusColor(status) {
@@ -54,18 +63,13 @@ async function loadAssets() {
 
     assets.forEach((asset, index) => {
 
-      const base = {
-        ICU: { x: 70, y: 20 },
-        ER: { x: 20, y: 30 },
-        Storage: { x: 70, y: 70 }
-      }[zone];
+      const base = positions[zone];
 
       const offsetX = (index % 3) * 5 - 5;
       const offsetY = Math.floor(index / 3) * 5;
 
       const div = document.createElement("div");
 
-      div.style.position = "absolute";
       div.style.left = (base.x + offsetX) + "%";
       div.style.top = (base.y + offsetY) + "%";
 
@@ -75,7 +79,7 @@ async function loadAssets() {
       if (role === "nurse") {
         div.innerHTML = `
           <div style="background:${color};color:white;padding:6px;border-radius:6px;">
-            ${formatName(asset.name)}<br>
+            ${asset.name}<br>
             <span style="color:${statusColor};font-size:11px;">
               ● ${asset.status}
             </span>
@@ -86,9 +90,9 @@ async function loadAssets() {
       if (role === "engineer" || role === "admin") {
         div.innerHTML = `
           <div style="background:${color};color:white;padding:6px;border-radius:6px;">
-            ${formatName(asset.name)}<br>
+            ${asset.name}<br>
             ${asset.zone}<br>
-            ${asset.time}<br>
+            ${formatTime(asset.time)}<br>
             <span style="color:${statusColor};font-size:11px;">
               ● ${asset.status}
             </span>
@@ -99,12 +103,102 @@ async function loadAssets() {
       map.appendChild(div);
     });
   });
+
+  applySearchHighlight();
+
+  if (role !== "nurse") {
+    showChart(data);
+  }
+}
+
+/* ---------------- SEARCH FIX ---------------- */
+
+function searchAsset() {
+  currentSearch = document.getElementById("search").value.toLowerCase();
+  applySearchHighlight();
+}
+
+function applySearchHighlight() {
+  document.querySelectorAll("#map div").forEach(el => {
+    if (el.innerText.toLowerCase().includes(currentSearch)) {
+      el.style.border = "3px solid yellow";
+    } else {
+      el.style.border = "none";
+    }
+  });
+}
+
+/* ---------------- CHART ---------------- */
+
+let chartInstance = null;
+
+function showChart(data) {
+  const counts = {};
+
+  data.forEach(a => {
+    counts[a.name] = (counts[a.name] || 0) + 1;
+  });
+
+  const ctx = document.getElementById("chart");
+
+  if (!ctx) return;
+
+  if (chartInstance) chartInstance.destroy();
+
+  chartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: Object.keys(counts),
+      datasets: [{
+        label: 'Assets by Type',
+        data: Object.values(counts)
+      }]
+    }
+  });
+}
+
+/* ---------------- HISTORY ---------------- */
+
+async function loadHistory() {
+  if (role !== "admin") return;
+
+  document.getElementById("adminPanel").style.display = "block";
+
+  const res = await fetch('/history');
+  const data = await res.json();
+
+  const div = document.getElementById("history");
+
+  div.innerHTML = "<h3>Recent Activity</h3>";
+
+  data.slice(-10).forEach(item => {
+    div.innerHTML += `<p>${item.name} → ${item.zone} (${formatTime(item.time)})</p>`;
+  });
+}
+
+/* ---------------- RESET ---------------- */
+
+function resetSystem() {
+  fetch('/reset').then(() => {
+    alert("System reset");
+    loadAssets();
+    loadHistory();
+  });
+}
+
+/* ---------------- LOGOUT ---------------- */
+
+function logout() {
+  localStorage.removeItem("role");
+  window.location.href = "/login.html";
 }
 
 /* ---------------- REFRESH ---------------- */
 
 setInterval(() => {
   loadAssets();
+  loadHistory();
 }, 1000);
 
 loadAssets();
+loadHistory();
